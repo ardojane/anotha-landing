@@ -11,6 +11,7 @@ class NaviGoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'NaviGo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: LandingPage(),
@@ -118,8 +119,7 @@ class _LandingPageState extends State<LandingPage> {
         itemCount: introData.length,
         itemBuilder: (context, index) {
           if (index == introData.length - 1) {
-            Future.microtask(() => _showLocationAccessDialog(context));
-            return SizedBox.shrink();
+            return _buildLocationAccessPage(); // Show the location permission page
           }
           return IntroContent(
             title: introData[index]['title'],
@@ -133,80 +133,31 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  void _showLocationAccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.location_on, size: 50, color: Colors.red),
-              SizedBox(height: 10),
-              Text(
-                "Location Access",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text(
-                "To guide you effectively, allow us\naccess to your location",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushReplacementNamed(
-                        context,
-                        '/home',
-                      ); // Navigate after denial
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.grey[200],
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text("Deny"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _requestLocationPermission();
-                      Navigator.pop(context);
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF4169E1), // Blue color
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text("Allow"),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+  Widget _buildLocationAccessPage() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.location_on, size: 100, color: Colors.blue),
+        SizedBox(height: 20),
+        Text("Allow us to access your location", textAlign: TextAlign.center),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+              child: Text("Deny"),
+            ),
+            SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: _requestLocationPermission,
+              child: Text("Allow"),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
